@@ -12,13 +12,14 @@ public class XMLHandler extends DefaultHandler
         {
             if (qName.equals("voter") && number < limit)
             {
-                String birthDay = attributes.getValue("birthDay");
+                String birthDay = attributes.getValue("birthDay").replace('.', '-');
                 String name = attributes.getValue("name");
-                DBconnection.countVoter(name,birthDay);
+                DBconnection.countVoter(name,birthDay,number);
                 number++;
-                if (number % 10000 == 0) {
-                    System.out.printf("<-------------- %d /%.3f sec/ -------------->%n"
-                            ,number,(double)(System.currentTimeMillis()-Loader.timer)/1000);
+                if (number % 100000 == 0) {
+                    System.out.printf("<-------------- %d * Part: %.3f sec * Total: %.1f sec -------------->%n"
+                            ,number,(double)(System.currentTimeMillis()-Loader.timer)/1000,
+                                    (double)(System.currentTimeMillis()-Loader.total_timer)/1000);
                     Loader.timer = System.currentTimeMillis();
                 }
             }
