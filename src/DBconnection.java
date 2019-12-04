@@ -64,8 +64,9 @@ public class DBconnection
     {
         long start = System.currentTimeMillis();
         int counter = 0;
-        String sql = "select name,birthDate,vote_count from (select name,birthDate,count(count) " +
-                "as vote_count from voter_count group by name ) as result where vote_count > 1";
+        String sql = "select name,birthDate,vote_num from (select name,count,birthDate," +
+                "count(count) as vote_num from voter_count group by name,birthDate order " +
+                "by vote_num Desc) as result where vote_num > 1";
         ResultSet rs = DBconnection.getConnection().createStatement().executeQuery(sql);
         StringBuilder result = new StringBuilder();
         while(rs.next())
@@ -77,17 +78,17 @@ public class DBconnection
                     .append(" ")
                     .append(rs.getString("birthDate"))
                     .append(" ")
-                    .append(rs.getInt("vote_count"))
+                    .append(rs.getInt("vote_num"))
                     .append("\n");
         }
-        System.out.println(result.toString());
+        System.out.println(result.toString().isBlank() ? "Дубликатов не найдено" : result.toString());
         System.out.printf("%.3f sec.%n",(double)(System.currentTimeMillis() - start)/1000);
         rs.close();
     }
     public static void customSelect(String name) throws SQLException
     {
         long start = System.currentTimeMillis();
-        String sql = "SELECT name FROM voter_count WHERE name ='"+ name + "'";
+        String sql = "SELECT name, birthDate FROM voter_count WHERE name ='"+ name + "'";
 
         ResultSet rs = DBconnection.getConnection().createStatement().executeQuery(sql);
         StringBuilder result = new StringBuilder();
@@ -95,9 +96,11 @@ public class DBconnection
         {
             result.append("\t")
                     .append(rs.getString("name"))
+                    .append(" ")
+                    .append(rs.getString("birthDate"))
                     .append("\n");
         }
-        System.out.println(result.toString());
+        System.out.println(result.toString().isBlank() ? "Нет такой записи" : result.toString());
         System.out.printf("%.3f sec.%n",(double)(System.currentTimeMillis() - start)/1000);
         rs.close();
 
